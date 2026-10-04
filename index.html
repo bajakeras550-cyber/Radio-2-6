@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BLE Scanner</title>
+<title>Bluetooth Scanner</title>
 
 <style>
 *{
@@ -14,7 +14,7 @@
 body{
     margin:0;
     font-family:Arial,sans-serif;
-    background:#101010;
+    background:#0d0d0d;
     color:white;
 }
 
@@ -42,10 +42,11 @@ h1{
 }
 
 .card{
-    background:#1e1e1e;
+    background:#1b1b1b;
     padding:22px;
     border-radius:20px;
     margin-bottom:20px;
+    border:1px solid #292929;
 }
 
 .title{
@@ -55,9 +56,9 @@ h1{
 }
 
 .device{
-    background:#292929;
+    background:#272727;
     padding:15px;
-    border-radius:12px;
+    border-radius:13px;
     margin-top:12px;
 }
 
@@ -71,7 +72,7 @@ h1{
     color:#aaa;
     font-size:14px;
     margin-top:8px;
-    line-height:1.5;
+    line-height:1.6;
 }
 
 button{
@@ -110,20 +111,41 @@ button:active{
 }
 
 .info-row{
-    margin-bottom:12px;
+    margin-bottom:15px;
 }
 
 .label{
     color:#888;
+    font-size:13px;
+    margin-bottom:3px;
 }
 
 .value{
     color:white;
+    font-size:16px;
     word-break:break-word;
 }
 
-.note{
+.frequency{
+    text-align:center;
+    font-size:35px;
+    font-weight:bold;
+    margin:12px 0;
+}
+
+.frequency-label{
+    text-align:center;
     color:#999;
+}
+
+.classic-box{
+    background:#272727;
+    padding:18px;
+    border-radius:13px;
+}
+
+.classic-status{
+    color:#ffc857;
     line-height:1.6;
 }
 </style>
@@ -135,19 +157,19 @@ button:active{
 
     <div class="logo">🔵</div>
 
-    <h1>BLE Scanner</h1>
+    <h1>Bluetooth Scanner</h1>
 
     <div class="subtitle">
-        Bluetooth Low Energy Scanner
+        Bluetooth Low Energy & Bluetooth Classic
     </div>
 
 
-    <!-- SCANNER -->
+    <!-- BLE SCANNER -->
 
     <div class="card">
 
         <div class="title">
-            🔍 Pemindai BLE
+            🔵 Bluetooth Low Energy
         </div>
 
         <div class="device">
@@ -182,48 +204,139 @@ button:active{
     <div class="card">
 
         <div class="title">
-            📱 Informasi Perangkat
+            📱 Perangkat BLE
         </div>
 
         <div class="info-row">
-            <div class="label">Nama</div>
-            <div class="value" id="infoName">-</div>
+
+            <div class="label">
+                Nama perangkat
+            </div>
+
+            <div class="value" id="infoName">
+                -
+            </div>
+
         </div>
 
         <div class="info-row">
-            <div class="label">ID</div>
-            <div class="value" id="infoId">-</div>
+
+            <div class="label">
+                ID perangkat
+            </div>
+
+            <div class="value" id="infoId">
+                -
+            </div>
+
         </div>
 
         <div class="info-row">
-            <div class="label">Status</div>
+
+            <div class="label">
+                Status koneksi
+            </div>
+
             <div class="value" id="infoStatus">
                 Tidak terhubung
             </div>
+
         </div>
 
         <div class="info-row">
-            <div class="label">Baterai</div>
+
+            <div class="label">
+                Baterai
+            </div>
+
             <div class="value" id="infoBattery">
                 -
             </div>
+
         </div>
 
     </div>
 
 
-    <!-- CATATAN -->
+    <!-- FREKUENSI -->
 
     <div class="card">
 
         <div class="title">
-            ℹ️ Informasi
+            📡 Frekuensi Bluetooth
         </div>
 
-        <div class="note">
-            Scanner ini khusus untuk Bluetooth Low Energy (BLE).
-            <br><br>
-            Tidak ada fitur Wi-Fi dan tidak ada fitur radio FM.
+        <div class="frequency">
+            2,4 GHz
+        </div>
+
+        <div class="frequency-label">
+            Pita frekuensi ISM
+        </div>
+
+    </div>
+
+
+    <!-- BLUETOOTH CLASSIC -->
+
+    <div class="card">
+
+        <div class="title">
+            🟦 Bluetooth Classic
+        </div>
+
+        <div class="classic-box">
+
+            <div class="classic-status">
+                Bluetooth Classic menggunakan pita 2,4 GHz.
+                <br><br>
+
+                Pemindaian Bluetooth Classic secara langsung
+                tidak tersedia melalui JavaScript pada website
+                GitHub Pages.
+                <br><br>
+
+                Website ini tidak akan menampilkan hasil palsu.
+                Untuk pemindaian Classic yang sebenarnya diperlukan
+                akses Bluetooth dari sistem operasi atau aplikasi
+                native.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- STATUS BLUETOOTH -->
+
+    <div class="card">
+
+        <div class="title">
+            ⚙️ Status Bluetooth
+        </div>
+
+        <div class="info-row">
+
+            <div class="label">
+                Dukungan Web Bluetooth
+            </div>
+
+            <div class="value" id="webBluetooth">
+                Memeriksa...
+            </div>
+
+        </div>
+
+        <div class="info-row">
+
+            <div class="label">
+                Adapter Bluetooth
+            </div>
+
+            <div class="value" id="adapterStatus">
+                Memeriksa...
+            </div>
+
         </div>
 
     </div>
@@ -266,6 +379,12 @@ document.getElementById("infoStatus");
 const infoBattery =
 document.getElementById("infoBattery");
 
+const webBluetooth =
+document.getElementById("webBluetooth");
+
+const adapterStatus =
+document.getElementById("adapterStatus");
+
 
 // CEK BLUETOOTH
 
@@ -273,23 +392,41 @@ async function checkBluetooth(){
 
     if(!navigator.bluetooth){
 
+        webBluetooth.innerText =
+        "❌ Tidak didukung";
+
+        adapterStatus.innerText =
+        "❌ Tidak tersedia";
+
         availability.innerText =
         "❌ Browser tidak mendukung Web Bluetooth.";
 
         return;
     }
 
+
+    webBluetooth.innerText =
+    "✅ Didukung";
+
+
     try{
 
         const available =
         await navigator.bluetooth.getAvailability();
 
+
         if(available){
+
+            adapterStatus.innerText =
+            "✅ Tersedia";
 
             availability.innerText =
             "✅ Bluetooth tersedia";
 
         }else{
+
+            adapterStatus.innerText =
+            "⚠️ Tidak tersedia";
 
             availability.innerText =
             "⚠️ Bluetooth tidak tersedia.";
@@ -297,6 +434,9 @@ async function checkBluetooth(){
         }
 
     }catch(error){
+
+        adapterStatus.innerText =
+        "⚠️ Tidak dapat diperiksa";
 
         availability.innerText =
         "⚠️ Tidak dapat memeriksa Bluetooth.";
@@ -316,7 +456,7 @@ async function scanBLE(){
         "❌ Web Bluetooth tidak tersedia";
 
         bleStatus.innerText =
-        "Gunakan browser yang mendukung Web Bluetooth.";
+        "Browser ini tidak mendukung Web Bluetooth.";
 
         return;
     }
@@ -411,6 +551,7 @@ async function readBattery(){
 
     if(!bleServer) return;
 
+
     try{
 
         const service =
@@ -452,7 +593,7 @@ async function readBattery(){
         bleStatus.innerHTML =
         '<span class="connected">● TERHUBUNG</span>' +
         '<br><br>' +
-        'Perangkat tidak menyediakan Battery Service.';
+        'Battery Service tidak tersedia.';
 
     }
 
@@ -484,7 +625,7 @@ function disconnectBLE(){
 }
 
 
-// KETIKA TERPUTUS
+// TERPUTUS
 
 function handleDisconnect(){
 
