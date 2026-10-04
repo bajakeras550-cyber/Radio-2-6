@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>RadioKu</title>
+<title>RadioKu Scanner</title>
 
 <style>
 *{
@@ -32,7 +32,13 @@ body{
 
 h1{
     text-align:center;
-    margin:5px 0 25px;
+    margin:5px 0 8px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#999;
+    margin-bottom:25px;
 }
 
 .card{
@@ -48,50 +54,20 @@ h1{
     margin-bottom:15px;
 }
 
-select,
-input,
 button{
     width:100%;
-    padding:14px;
+    padding:15px;
     margin-top:10px;
     border:0;
     border-radius:12px;
     font-size:16px;
-}
-
-select,
-input{
+    color:white;
     background:#333;
-    color:white;
-}
-
-button{
-    background:#444;
-    color:white;
     cursor:pointer;
 }
 
 button:active{
     transform:scale(.98);
-}
-
-audio{
-    width:100%;
-    margin-top:15px;
-}
-
-.status{
-    text-align:center;
-    color:#aaa;
-    margin-top:12px;
-    font-size:14px;
-}
-
-.big{
-    font-size:28px;
-    font-weight:bold;
-    text-align:center;
-    margin:15px 0;
 }
 
 .device{
@@ -104,6 +80,7 @@ audio{
 .device-name{
     font-size:19px;
     font-weight:bold;
+    word-break:break-word;
 }
 
 .device-info{
@@ -113,12 +90,31 @@ audio{
     line-height:1.5;
 }
 
+.status{
+    text-align:center;
+    color:#aaa;
+    margin-top:12px;
+    font-size:14px;
+}
+
 .connected{
-    color:#62ff8a;
+    color:#5cff87;
 }
 
 .disconnected{
     color:#ff7777;
+}
+
+.warning{
+    color:#ffc857;
+    line-height:1.6;
+}
+
+.big{
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+    margin:15px 0;
 }
 </style>
 </head>
@@ -127,84 +123,24 @@ audio{
 
 <div class="container">
 
-    <div class="logo">📻</div>
+    <div class="logo">📡</div>
 
-    <h1>RadioKu</h1>
+    <h1>ScannerKu</h1>
 
-
-    <!-- RADIO STREAMING -->
-
-    <div class="card">
-
-        <div class="title">📡 Radio Streaming</div>
-
-        <select id="station">
-
-            <option value="https://stream-node1.rri.co.id/streaming/25/9025/rrijakartapro1.mp3">
-                RRI Jakarta Pro 1
-            </option>
-
-            <option value="https://stream-node0.rri.co.id/streaming/21/9021/rridenpasarpro1.mp3">
-                RRI Denpasar Pro 1
-            </option>
-
-            <option value="https://stream-node0.rri.co.id/streaming/18/9018/rrisurabayapro1.mp3">
-                RRI Surabaya Pro 1
-            </option>
-
-            <option value="https://stream-node0.rri.co.id/streaming/19/9019/rribanjarmasinpro1.mp3">
-                RRI Banjarmasin Pro 1
-            </option>
-
-        </select>
-
-        <button onclick="playRadio()">
-            ▶️ PUTAR RADIO
-        </button>
-
-        <audio id="radio" controls></audio>
-
-        <div class="status" id="radioStatus">
-            Pilih radio lalu tekan PUTAR
-        </div>
-
+    <div class="subtitle">
+        Bluetooth Low Energy & Wi-Fi
     </div>
 
 
-    <!-- PENCARIAN FREKUENSI FM -->
+    <!-- =========================
+         BLUETOOTH LOW ENERGY
+    ========================== -->
 
     <div class="card">
 
-        <div class="title">🔎 Pencarian Frekuensi FM</div>
-
-        <input
-            type="number"
-            id="fmInput"
-            min="87.5"
-            max="108"
-            step="0.1"
-            placeholder="Contoh: 98.7">
-
-        <button onclick="searchFM()">
-            🔍 CARI FREKUENSI
-        </button>
-
-        <div class="big" id="fmResult">
-            --.- MHz
+        <div class="title">
+            🔵 Bluetooth Low Energy
         </div>
-
-        <div class="status" id="fmStatus">
-            Rentang FM: 87,5 – 108 MHz
-        </div>
-
-    </div>
-
-
-    <!-- BLUETOOTH LOW ENERGY -->
-
-    <div class="card">
-
-        <div class="title">🔵 Bluetooth Low Energy</div>
 
         <div class="device">
 
@@ -213,39 +149,125 @@ audio{
             </div>
 
             <div class="device-info" id="bleStatus">
-                Tekan tombol di bawah untuk mencari perangkat BLE.
+                Tekan tombol untuk mencari perangkat BLE.
             </div>
 
         </div>
 
-        <button onclick="scanBLE()">
+        <button id="scanBleButton">
             🔍 CARI PERANGKAT BLE
         </button>
 
-        <button onclick="disconnectBLE()">
-            🔌 PUTUSKAN
+        <button id="disconnectBleButton">
+            🔌 PUTUSKAN BLE
         </button>
 
-        <div class="status">
-            Bluetooth harus aktif dan browser harus mendukung Web Bluetooth.
+        <div class="status" id="bleAvailability">
+            Memeriksa dukungan Bluetooth...
         </div>
 
     </div>
 
 
-    <!-- INFORMASI BLE -->
+    <!-- =========================
+         INFORMASI BLE
+    ========================== -->
 
     <div class="card">
 
-        <div class="title">📡 Informasi BLE</div>
+        <div class="title">
+            📊 Informasi BLE
+        </div>
 
         <div class="device-info">
 
-            BLE = Bluetooth Low Energy.<br><br>
+            <div>
+                Nama:
+                <strong id="infoName">-</strong>
+            </div>
 
-            Website dapat meminta koneksi ke perangkat BLE
-            yang didukung browser. Perangkat harus dipilih
-            melalui dialog Bluetooth yang muncul dari browser.
+            <br>
+
+            <div>
+                ID:
+                <strong id="infoId">-</strong>
+            </div>
+
+            <br>
+
+            <div>
+                Status:
+                <strong id="infoConnection">
+                    Tidak terhubung
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         WI-FI
+    ========================== -->
+
+    <div class="card">
+
+        <div class="title">
+            📶 Wi-Fi
+        </div>
+
+        <div class="big">
+            📡
+        </div>
+
+        <div class="warning">
+            Website biasa tidak mendapatkan akses langsung
+            untuk memindai nama jaringan Wi-Fi di sekitar,
+            kekuatan sinyal setiap router, atau jarak router.
+        </div>
+
+        <button id="wifiCheckButton">
+            🔎 CEK KEMAMPUAN WI-FI
+        </button>
+
+        <div class="device">
+
+            <div class="device-name" id="wifiResult">
+                Belum diperiksa
+            </div>
+
+            <div class="device-info" id="wifiInfo">
+                Tekan tombol untuk melihat informasi yang
+                dapat diberikan browser.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         CATATAN
+    ========================== -->
+
+    <div class="card">
+
+        <div class="title">
+            ℹ️ Catatan
+        </div>
+
+        <div class="device-info">
+
+            BLE dapat digunakan untuk berkomunikasi
+            dengan perangkat yang mendukung Bluetooth
+            Low Energy dan memberikan izin kepada website.
+
+            <br><br>
+
+            Untuk Wi-Fi, browser tidak menyediakan
+            pemindai jaringan sekitar seperti aplikasi
+            Wi-Fi Analyzer.
 
         </div>
 
@@ -256,151 +278,99 @@ audio{
 
 <script>
 
-/* =========================
-   RADIO STREAMING
-========================= */
-
-const radio = document.getElementById("radio");
-const station = document.getElementById("station");
-const radioStatus = document.getElementById("radioStatus");
-
-function playRadio(){
-
-    radio.src = station.value;
-
-    radioStatus.innerText =
-        "⏳ Menghubungkan ke radio...";
-
-    radio.play()
-    .then(() => {
-
-        radioStatus.innerText =
-            "🔊 Radio sedang diputar";
-
-    })
-    .catch(() => {
-
-        radioStatus.innerText =
-            "❌ Stream tidak dapat diputar.";
-
-    });
-}
-
-radio.addEventListener("playing", () => {
-
-    radioStatus.innerText =
-        "🔊 Radio sedang diputar";
-
-});
-
-radio.addEventListener("waiting", () => {
-
-    radioStatus.innerText =
-        "⏳ Buffering...";
-
-});
-
-radio.addEventListener("error", () => {
-
-    radioStatus.innerText =
-        "❌ Stream mengalami error.";
-
-});
-
-
-/* =========================
-   PENCARIAN FREKUENSI FM
-========================= */
-
-function searchFM(){
-
-    const value =
-        parseFloat(document.getElementById("fmInput").value);
-
-    const result =
-        document.getElementById("fmResult");
-
-    const status =
-        document.getElementById("fmStatus");
-
-
-    if(isNaN(value)){
-
-        result.innerText = "--.- MHz";
-
-        status.innerText =
-            "Masukkan frekuensi terlebih dahulu.";
-
-        return;
-    }
-
-
-    if(value < 87.5 || value > 108){
-
-        result.innerText = "--.- MHz";
-
-        status.innerText =
-            "❌ Frekuensi harus 87,5–108 MHz.";
-
-        return;
-    }
-
-
-    result.innerText =
-        value.toFixed(1) + " MHz";
-
-    status.innerText =
-        "✅ Frekuensi " +
-        value.toFixed(1) +
-        " MHz dipilih.";
-
-}
-
-
-/* =========================
+/* =================================
    BLUETOOTH LOW ENERGY
-========================= */
+================================= */
 
 let bleDevice = null;
 let bleServer = null;
 
+const bleName =
+    document.getElementById("bleName");
 
-/*
-   Battery Service:
-   0x180F
-   Battery Level Characteristic:
-   0x2A19
-*/
+const bleStatus =
+    document.getElementById("bleStatus");
 
-async function scanBLE(){
+const bleAvailability =
+    document.getElementById("bleAvailability");
 
-    const name =
-        document.getElementById("bleName");
+const infoName =
+    document.getElementById("infoName");
 
-    const status =
-        document.getElementById("bleStatus");
+const infoId =
+    document.getElementById("infoId");
 
+const infoConnection =
+    document.getElementById("infoConnection");
+
+
+/* CEK BLUETOOTH */
+
+async function checkBluetooth(){
 
     if(!navigator.bluetooth){
 
-        name.innerText =
-            "❌ Web Bluetooth tidak tersedia";
-
-        status.innerText =
-            "Gunakan browser yang mendukung Web Bluetooth dan buka situs melalui HTTPS.";
+        bleAvailability.innerText =
+            "❌ Browser ini tidak mendukung Web Bluetooth.";
 
         return;
     }
 
+    try{
+
+        const available =
+            await navigator.bluetooth.getAvailability();
+
+        if(available){
+
+            bleAvailability.innerText =
+                "✅ Bluetooth tersedia";
+
+        }else{
+
+            bleAvailability.innerText =
+                "⚠️ Bluetooth tidak tersedia atau tidak diizinkan.";
+
+        }
+
+    }catch(error){
+
+        bleAvailability.innerText =
+            "⚠️ Tidak dapat memeriksa Bluetooth.";
+
+    }
+
+}
+
+
+/* CARI BLE */
+
+async function scanBLE(){
+
+    if(!navigator.bluetooth){
+
+        bleName.innerText =
+            "❌ Web Bluetooth tidak tersedia";
+
+        bleStatus.innerText =
+            "Gunakan browser yang mendukung Web Bluetooth.";
+
+        return;
+    }
 
     try{
 
-        name.innerText =
-            "🔍 Mencari perangkat...";
+        bleName.innerText =
+            "🔍 Menunggu pilihan perangkat...";
 
-        status.innerText =
-            "Pilih perangkat BLE pada jendela Bluetooth.";
+        bleStatus.innerText =
+            "Pilih perangkat BLE dari jendela Bluetooth.";
 
+        /*
+         * acceptAllDevices:
+         * menampilkan perangkat BLE yang
+         * dapat dipilih oleh browser.
+         */
 
         bleDevice =
             await navigator.bluetooth.requestDevice({
@@ -414,47 +384,75 @@ async function scanBLE(){
             });
 
 
-        name.innerText =
+        infoName.innerText =
+            bleDevice.name || "Tanpa nama";
+
+        infoId.innerText =
+            bleDevice.id || "-";
+
+        bleName.innerText =
             "📱 " +
             (bleDevice.name || "Perangkat tanpa nama");
 
+        bleStatus.innerText =
+            "Menghubungkan...";
 
-        status.innerText =
-            "🔗 Menghubungkan...";
+
+        /* HUBUNGKAN GATT */
+
+        if(!bleDevice.gatt){
+
+            throw new Error(
+                "Perangkat tidak menyediakan GATT."
+            );
+
+        }
 
 
         bleServer =
             await bleDevice.gatt.connect();
 
 
-        status.innerHTML =
-            '<span class="connected">● TERHUBUNG</span>';
+        bleStatus.innerHTML =
+            '<span class="connected">' +
+            '● TERHUBUNG' +
+            '</span>';
+
+
+        infoConnection.innerHTML =
+            '<span class="connected">' +
+            'TERHUBUNG' +
+            '</span>';
 
 
         bleDevice.addEventListener(
             "gattserverdisconnected",
-            onBLEDisconnected
+            handleDisconnect
         );
 
+
+        /* COBA BACA BATERAI */
 
         await readBattery();
 
     }catch(error){
 
-        name.innerText =
+        bleName.innerText =
             "❌ Tidak terhubung";
 
-        status.innerText =
-            error.message || "Koneksi dibatalkan.";
+        bleStatus.innerText =
+            error.message ||
+            "Pencarian dibatalkan.";
+
+        infoConnection.innerText =
+            "Tidak terhubung";
 
     }
 
 }
 
 
-/* =========================
-   BACA BATERAI BLE
-========================= */
+/* BACA BATTERY SERVICE */
 
 async function readBattery(){
 
@@ -462,7 +460,6 @@ async function readBattery(){
 
         return;
     }
-
 
     try{
 
@@ -486,26 +483,29 @@ async function readBattery(){
             value.getUint8(0);
 
 
-        document.getElementById("bleStatus").innerHTML =
-            '<span class="connected">● TERHUBUNG</span><br>' +
-            "🔋 Baterai: " +
+        bleStatus.innerHTML =
+            '<span class="connected">' +
+            '● TERHUBUNG' +
+            '</span><br><br>' +
+            '🔋 Baterai: ' +
             battery +
-            "%";
+            '%';
 
     }catch(error){
 
-        document.getElementById("bleStatus").innerHTML =
-            '<span class="connected">● TERHUBUNG</span><br>' +
-            "Perangkat tidak menyediakan informasi baterai.";
+        bleStatus.innerHTML =
+            '<span class="connected">' +
+            '● TERHUBUNG' +
+            '</span><br><br>' +
+            'Perangkat tidak menyediakan ' +
+            'Battery Service.';
 
     }
 
 }
 
 
-/* =========================
-   PUTUSKAN BLE
-========================= */
+/* PUTUSKAN */
 
 function disconnectBLE(){
 
@@ -517,27 +517,97 @@ function disconnectBLE(){
 
         bleDevice.gatt.disconnect();
 
+    }else{
+
+        bleName.innerText =
+            "Tidak ada koneksi BLE";
+
+        bleStatus.innerText =
+            "Tidak ada perangkat yang sedang terhubung.";
+
     }
 
-    document.getElementById("bleName").innerText =
-        "Belum terhubung";
+}
 
-    document.getElementById("bleStatus").innerText =
-        "Perangkat BLE telah diputuskan.";
+
+/* SAAT TERPUTUS */
+
+function handleDisconnect(){
+
+    bleStatus.innerHTML =
+        '<span class="disconnected">' +
+        '● TERPUTUS' +
+        '</span>';
+
+    infoConnection.innerHTML =
+        '<span class="disconnected">' +
+        'TERPUTUS' +
+        '</span>';
 
 }
 
 
-/* =========================
-   DISCONNECTED EVENT
-========================= */
+/* =================================
+   WI-FI
+================================= */
 
-function onBLEDisconnected(){
+function checkWiFi(){
 
-    document.getElementById("bleStatus").innerHTML =
-        '<span class="disconnected">● TERPUTUS</span>';
+    const result =
+        document.getElementById("wifiResult");
+
+    const info =
+        document.getElementById("wifiInfo");
+
+
+    /*
+     * Browser tidak memberikan daftar
+     * SSID Wi-Fi sekitar.
+     */
+
+    result.innerText =
+        "⚠️ Scanner Wi-Fi tidak tersedia";
+
+    info.innerText =
+        "GitHub Pages/browser tidak memiliki " +
+        "akses ke daftar jaringan Wi-Fi sekitar. " +
+        "Untuk scan SSID, channel, RSSI, dan jarak " +
+        "diperlukan akses sistem/perangkat khusus.";
 
 }
+
+
+/* =================================
+   EVENT
+================================= */
+
+document
+    .getElementById("scanBleButton")
+    .addEventListener(
+        "click",
+        scanBLE
+    );
+
+
+document
+    .getElementById("disconnectBleButton")
+    .addEventListener(
+        "click",
+        disconnectBLE
+    );
+
+
+document
+    .getElementById("wifiCheckButton")
+    .addEventListener(
+        "click",
+        checkWiFi
+    );
+
+
+/* MULAI */
+
+checkBluetooth();
 
 </script>
 
