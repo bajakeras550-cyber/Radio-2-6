@@ -14,62 +14,98 @@
 body{
     margin:0;
     font-family:Arial,sans-serif;
-    background:#111;
+    background:#101010;
     color:white;
-    text-align:center;
 }
 
 .container{
-    max-width:500px;
+    max-width:520px;
     margin:auto;
-    padding:30px 20px;
+    padding:25px 18px;
 }
 
 .logo{
+    text-align:center;
     font-size:70px;
-    margin-top:30px;
+    margin-top:10px;
 }
 
 h1{
-    font-size:32px;
-    margin:10px 0;
+    text-align:center;
+    margin:5px 0 25px;
 }
 
 .card{
     background:#1e1e1e;
+    padding:22px;
     border-radius:20px;
-    padding:25px;
-    margin-top:30px;
-}
-
-.station{
-    font-size:22px;
     margin-bottom:20px;
 }
 
-audio{
+.title{
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+select,
+input,
+button{
     width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:0;
+    border-radius:12px;
+    font-size:16px;
+}
+
+select,
+input{
+    background:#333;
+    color:white;
 }
 
 button{
-    width:100%;
-    padding:15px;
-    margin-top:15px;
-    border:0;
-    border-radius:12px;
-    background:#333;
+    background:#444;
     color:white;
-    font-size:16px;
     cursor:pointer;
 }
 
 button:active{
-    transform:scale(0.98);
+    transform:scale(.98);
 }
 
-#status{
+audio{
+    width:100%;
     margin-top:15px;
+}
+
+.status{
+    text-align:center;
     color:#aaa;
+    margin-top:12px;
+    font-size:14px;
+}
+
+.frequency{
+    background:#292929;
+    padding:15px;
+    border-radius:12px;
+    margin-top:10px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.big{
+    font-size:28px;
+    font-weight:bold;
+    text-align:center;
+    margin:15px 0;
+}
+
+.info{
+    color:#aaa;
+    line-height:1.6;
     font-size:14px;
 }
 </style>
@@ -83,75 +119,284 @@ button:active{
 
     <h1>RadioKu</h1>
 
+
+    <!-- RADIO STREAMING -->
     <div class="card">
 
-        <div class="station">
-            RRI Jakarta Pro 1
-        </div>
+        <div class="title">📡 Radio Streaming</div>
 
-        <audio id="radio" controls preload="none">
-            <source
-                src="https://stream-node1.rri.co.id/streaming/25/9025/rrijakartapro1.mp3"
-                type="audio/mpeg">
-            Browser kamu tidak mendukung audio.
-        </audio>
+        <select id="station">
+
+            <option value="https://stream-node1.rri.co.id/streaming/25/9025/rrijakartapro1.mp3">
+                RRI Jakarta Pro 1
+            </option>
+
+            <option value="https://stream-node0.rri.co.id/streaming/21/9021/rridenpasarpro1.mp3">
+                RRI Denpasar Pro 1
+            </option>
+
+            <option value="https://stream-node0.rri.co.id/streaming/18/9018/rrisurabayapro1.mp3">
+                RRI Surabaya Pro 1
+            </option>
+
+            <option value="https://stream-node0.rri.co.id/streaming/19/9019/rribanjarmasinpro1.mp3">
+                RRI Banjarmasin Pro 1
+            </option>
+
+        </select>
 
         <button onclick="playRadio()">
-            ▶️ Putar Radio
+            ▶️ PUTAR RADIO
         </button>
 
-        <button onclick="reloadRadio()">
-            🔄 Muat Ulang
-        </button>
+        <audio id="radio" controls></audio>
 
-        <div id="status">
-            Siap diputar
+        <div class="status" id="radioStatus">
+            Pilih radio lalu tekan PUTAR
         </div>
+
+    </div>
+
+
+    <!-- PENCARIAN FREKUENSI FM -->
+    <div class="card">
+
+        <div class="title">🔎 Pencarian Frekuensi FM</div>
+
+        <input
+            type="number"
+            id="fmInput"
+            min="87.5"
+            max="108"
+            step="0.1"
+            placeholder="Masukkan frekuensi, contoh 98.7">
+
+        <button onclick="searchFM()">
+            🔍 CARI FREKUENSI
+        </button>
+
+        <div class="big" id="fmResult">
+            --.- MHz
+        </div>
+
+        <div class="status" id="fmStatus">
+            Rentang FM: 87,5 – 108 MHz
+        </div>
+
+    </div>
+
+
+    <!-- SCAN FREKUENSI -->
+    <div class="card">
+
+        <div class="title">📻 Daftar Frekuensi FM</div>
+
+        <button onclick="scanFM()">
+            🔄 TAMPILKAN FREKUENSI
+        </button>
+
+        <div id="frequencyList"></div>
+
+    </div>
+
+
+    <!-- BLUETOOTH -->
+    <div class="card">
+
+        <div class="title">🔵 Frekuensi Bluetooth</div>
+
+        <div class="big">
+            2.400 – 2.483,5 MHz
+        </div>
+
+        <div class="info">
+            Bluetooth menggunakan pita 2,4 GHz ISM.
+            Bluetooth BR/EDR mempunyai kanal RF dengan
+            frekuensi pusat 2402 sampai 2480 MHz.
+        </div>
+
+        <button onclick="showBluetooth()">
+            📡 TAMPILKAN KANAL BLUETOOTH
+        </button>
+
+        <div id="bluetoothList"></div>
 
     </div>
 
 </div>
 
+
 <script>
+
+/* =========================
+   RADIO STREAMING
+========================= */
+
 const radio = document.getElementById("radio");
-const statusText = document.getElementById("status");
+const station = document.getElementById("station");
+const radioStatus = document.getElementById("radioStatus");
 
 function playRadio(){
-    statusText.textContent = "Menghubungkan ke radio...";
+
+    radio.src = station.value;
+
+    radioStatus.innerText =
+        "⏳ Menghubungkan ke radio...";
 
     radio.play()
     .then(() => {
-        statusText.textContent = "🔊 Radio sedang diputar";
+
+        radioStatus.innerText =
+            "🔊 Radio sedang diputar";
+
     })
     .catch(() => {
-        statusText.textContent =
-            "❌ Radio tidak dapat diputar dari browser ini.";
+
+        radioStatus.innerText =
+            "❌ Stream tidak dapat diputar.";
+
     });
 }
 
-function reloadRadio(){
-    radio.pause();
-    radio.load();
-
-    statusText.textContent = "Memuat ulang radio...";
-
-    setTimeout(() => {
-        playRadio();
-    }, 500);
-}
-
 radio.addEventListener("playing", () => {
-    statusText.textContent = "🔊 Radio sedang diputar";
+
+    radioStatus.innerText =
+        "🔊 Radio sedang diputar";
+
 });
 
 radio.addEventListener("waiting", () => {
-    statusText.textContent = "⏳ Menghubungkan...";
+
+    radioStatus.innerText =
+        "⏳ Buffering...";
+
 });
 
 radio.addEventListener("error", () => {
-    statusText.textContent =
-        "❌ Stream radio tidak bisa diakses.";
+
+    radioStatus.innerText =
+        "❌ Stream mengalami error.";
+
 });
+
+
+/* =========================
+   CARI FREKUENSI FM
+========================= */
+
+function searchFM(){
+
+    let value =
+        parseFloat(document.getElementById("fmInput").value);
+
+    let result =
+        document.getElementById("fmResult");
+
+    let status =
+        document.getElementById("fmStatus");
+
+
+    if(isNaN(value)){
+
+        result.innerText = "--.- MHz";
+
+        status.innerText =
+            "Masukkan frekuensi terlebih dahulu.";
+
+        return;
+    }
+
+
+    if(value < 87.5 || value > 108){
+
+        result.innerText = "--.- MHz";
+
+        status.innerText =
+            "❌ Frekuensi harus 87,5–108 MHz.";
+
+        return;
+    }
+
+
+    result.innerText =
+        value.toFixed(1) + " MHz";
+
+    status.innerText =
+        "✅ Frekuensi berada dalam rentang FM.";
+
+}
+
+
+/* =========================
+   DAFTAR FREKUENSI FM
+========================= */
+
+function scanFM(){
+
+    const list =
+        document.getElementById("frequencyList");
+
+    list.innerHTML = "";
+
+
+    for(
+        let frequency = 87.5;
+        frequency <= 108.0;
+        frequency += 0.1
+    ){
+
+        let div =
+            document.createElement("div");
+
+        div.className = "frequency";
+
+        div.innerHTML =
+            "<span>FM</span>" +
+            "<strong>" +
+            frequency.toFixed(1) +
+            " MHz</strong>";
+
+        list.appendChild(div);
+    }
+
+}
+
+
+/* =========================
+   BLUETOOTH
+========================= */
+
+function showBluetooth(){
+
+    const list =
+        document.getElementById("bluetoothList");
+
+    list.innerHTML = "";
+
+
+    for(let channel = 0; channel <= 78; channel++){
+
+        let frequency =
+            2402 + channel;
+
+        let div =
+            document.createElement("div");
+
+        div.className = "frequency";
+
+        div.innerHTML =
+            "<span>CH " +
+            channel +
+            "</span>" +
+            "<strong>" +
+            frequency +
+            " MHz</strong>";
+
+        list.appendChild(div);
+    }
+
+}
+
 </script>
 
 </body>
