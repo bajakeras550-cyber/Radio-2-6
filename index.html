@@ -87,15 +87,6 @@ audio{
     font-size:14px;
 }
 
-.frequency{
-    background:#292929;
-    padding:15px;
-    border-radius:12px;
-    margin-top:10px;
-    display:flex;
-    justify-content:space-between;
-}
-
 .big{
     font-size:28px;
     font-weight:bold;
@@ -103,10 +94,31 @@ audio{
     margin:15px 0;
 }
 
-.info{
+.device{
+    background:#292929;
+    padding:15px;
+    border-radius:12px;
+    margin-top:12px;
+}
+
+.device-name{
+    font-size:19px;
+    font-weight:bold;
+}
+
+.device-info{
     color:#aaa;
-    line-height:1.6;
     font-size:14px;
+    margin-top:8px;
+    line-height:1.5;
+}
+
+.connected{
+    color:#62ff8a;
+}
+
+.disconnected{
+    color:#ff7777;
 }
 </style>
 </head>
@@ -121,6 +133,7 @@ audio{
 
 
     <!-- RADIO STREAMING -->
+
     <div class="card">
 
         <div class="title">📡 Radio Streaming</div>
@@ -159,6 +172,7 @@ audio{
 
 
     <!-- PENCARIAN FREKUENSI FM -->
+
     <div class="card">
 
         <div class="title">🔎 Pencarian Frekuensi FM</div>
@@ -169,7 +183,7 @@ audio{
             min="87.5"
             max="108"
             step="0.1"
-            placeholder="Masukkan frekuensi, contoh 98.7">
+            placeholder="Contoh: 98.7">
 
         <button onclick="searchFM()">
             🔍 CARI FREKUENSI
@@ -186,40 +200,54 @@ audio{
     </div>
 
 
-    <!-- SCAN FREKUENSI -->
+    <!-- BLUETOOTH LOW ENERGY -->
+
     <div class="card">
 
-        <div class="title">📻 Daftar Frekuensi FM</div>
+        <div class="title">🔵 Bluetooth Low Energy</div>
 
-        <button onclick="scanFM()">
-            🔄 TAMPILKAN FREKUENSI
+        <div class="device">
+
+            <div class="device-name" id="bleName">
+                Belum ada perangkat
+            </div>
+
+            <div class="device-info" id="bleStatus">
+                Tekan tombol di bawah untuk mencari perangkat BLE.
+            </div>
+
+        </div>
+
+        <button onclick="scanBLE()">
+            🔍 CARI PERANGKAT BLE
         </button>
 
-        <div id="frequencyList"></div>
+        <button onclick="disconnectBLE()">
+            🔌 PUTUSKAN
+        </button>
+
+        <div class="status">
+            Bluetooth harus aktif dan browser harus mendukung Web Bluetooth.
+        </div>
 
     </div>
 
 
-    <!-- BLUETOOTH -->
+    <!-- INFORMASI BLE -->
+
     <div class="card">
 
-        <div class="title">🔵 Frekuensi Bluetooth</div>
+        <div class="title">📡 Informasi BLE</div>
 
-        <div class="big">
-            2.400 – 2.483,5 MHz
+        <div class="device-info">
+
+            BLE = Bluetooth Low Energy.<br><br>
+
+            Website dapat meminta koneksi ke perangkat BLE
+            yang didukung browser. Perangkat harus dipilih
+            melalui dialog Bluetooth yang muncul dari browser.
+
         </div>
-
-        <div class="info">
-            Bluetooth menggunakan pita 2,4 GHz ISM.
-            Bluetooth BR/EDR mempunyai kanal RF dengan
-            frekuensi pusat 2402 sampai 2480 MHz.
-        </div>
-
-        <button onclick="showBluetooth()">
-            📡 TAMPILKAN KANAL BLUETOOTH
-        </button>
-
-        <div id="bluetoothList"></div>
 
     </div>
 
@@ -281,18 +309,18 @@ radio.addEventListener("error", () => {
 
 
 /* =========================
-   CARI FREKUENSI FM
+   PENCARIAN FREKUENSI FM
 ========================= */
 
 function searchFM(){
 
-    let value =
+    const value =
         parseFloat(document.getElementById("fmInput").value);
 
-    let result =
+    const result =
         document.getElementById("fmResult");
 
-    let status =
+    const status =
         document.getElementById("fmStatus");
 
 
@@ -322,78 +350,192 @@ function searchFM(){
         value.toFixed(1) + " MHz";
 
     status.innerText =
-        "✅ Frekuensi berada dalam rentang FM.";
+        "✅ Frekuensi " +
+        value.toFixed(1) +
+        " MHz dipilih.";
 
 }
 
 
 /* =========================
-   DAFTAR FREKUENSI FM
+   BLUETOOTH LOW ENERGY
 ========================= */
 
-function scanFM(){
-
-    const list =
-        document.getElementById("frequencyList");
-
-    list.innerHTML = "";
+let bleDevice = null;
+let bleServer = null;
 
 
-    for(
-        let frequency = 87.5;
-        frequency <= 108.0;
-        frequency += 0.1
+/*
+   Battery Service:
+   0x180F
+   Battery Level Characteristic:
+   0x2A19
+*/
+
+async function scanBLE(){
+
+    const name =
+        document.getElementById("bleName");
+
+    const status =
+        document.getElementById("bleStatus");
+
+
+    if(!navigator.bluetooth){
+
+        name.innerText =
+            "❌ Web Bluetooth tidak tersedia";
+
+        status.innerText =
+            "Gunakan browser yang mendukung Web Bluetooth dan buka situs melalui HTTPS.";
+
+        return;
+    }
+
+
+    try{
+
+        name.innerText =
+            "🔍 Mencari perangkat...";
+
+        status.innerText =
+            "Pilih perangkat BLE pada jendela Bluetooth.";
+
+
+        bleDevice =
+            await navigator.bluetooth.requestDevice({
+
+                acceptAllDevices:true,
+
+                optionalServices:[
+                    "battery_service"
+                ]
+
+            });
+
+
+        name.innerText =
+            "📱 " +
+            (bleDevice.name || "Perangkat tanpa nama");
+
+
+        status.innerText =
+            "🔗 Menghubungkan...";
+
+
+        bleServer =
+            await bleDevice.gatt.connect();
+
+
+        status.innerHTML =
+            '<span class="connected">● TERHUBUNG</span>';
+
+
+        bleDevice.addEventListener(
+            "gattserverdisconnected",
+            onBLEDisconnected
+        );
+
+
+        await readBattery();
+
+    }catch(error){
+
+        name.innerText =
+            "❌ Tidak terhubung";
+
+        status.innerText =
+            error.message || "Koneksi dibatalkan.";
+
+    }
+
+}
+
+
+/* =========================
+   BACA BATERAI BLE
+========================= */
+
+async function readBattery(){
+
+    if(!bleServer){
+
+        return;
+    }
+
+
+    try{
+
+        const service =
+            await bleServer.getPrimaryService(
+                "battery_service"
+            );
+
+
+        const characteristic =
+            await service.getCharacteristic(
+                "battery_level"
+            );
+
+
+        const value =
+            await characteristic.readValue();
+
+
+        const battery =
+            value.getUint8(0);
+
+
+        document.getElementById("bleStatus").innerHTML =
+            '<span class="connected">● TERHUBUNG</span><br>' +
+            "🔋 Baterai: " +
+            battery +
+            "%";
+
+    }catch(error){
+
+        document.getElementById("bleStatus").innerHTML =
+            '<span class="connected">● TERHUBUNG</span><br>' +
+            "Perangkat tidak menyediakan informasi baterai.";
+
+    }
+
+}
+
+
+/* =========================
+   PUTUSKAN BLE
+========================= */
+
+function disconnectBLE(){
+
+    if(
+        bleDevice &&
+        bleDevice.gatt &&
+        bleDevice.gatt.connected
     ){
 
-        let div =
-            document.createElement("div");
+        bleDevice.gatt.disconnect();
 
-        div.className = "frequency";
-
-        div.innerHTML =
-            "<span>FM</span>" +
-            "<strong>" +
-            frequency.toFixed(1) +
-            " MHz</strong>";
-
-        list.appendChild(div);
     }
+
+    document.getElementById("bleName").innerText =
+        "Belum terhubung";
+
+    document.getElementById("bleStatus").innerText =
+        "Perangkat BLE telah diputuskan.";
 
 }
 
 
 /* =========================
-   BLUETOOTH
+   DISCONNECTED EVENT
 ========================= */
 
-function showBluetooth(){
+function onBLEDisconnected(){
 
-    const list =
-        document.getElementById("bluetoothList");
-
-    list.innerHTML = "";
-
-
-    for(let channel = 0; channel <= 78; channel++){
-
-        let frequency =
-            2402 + channel;
-
-        let div =
-            document.createElement("div");
-
-        div.className = "frequency";
-
-        div.innerHTML =
-            "<span>CH " +
-            channel +
-            "</span>" +
-            "<strong>" +
-            frequency +
-            " MHz</strong>";
-
-        list.appendChild(div);
-    }
+    document.getElementById("bleStatus").innerHTML =
+        '<span class="disconnected">● TERPUTUS</span>';
 
 }
 
