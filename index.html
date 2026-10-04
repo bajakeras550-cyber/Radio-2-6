@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>RadioKu Scanner</title>
+<title>BLE Scanner</title>
 
 <style>
 *{
@@ -26,7 +26,7 @@ body{
 
 .logo{
     text-align:center;
-    font-size:70px;
+    font-size:75px;
     margin-top:10px;
 }
 
@@ -54,22 +54,6 @@ h1{
     margin-bottom:15px;
 }
 
-button{
-    width:100%;
-    padding:15px;
-    margin-top:10px;
-    border:0;
-    border-radius:12px;
-    font-size:16px;
-    color:white;
-    background:#333;
-    cursor:pointer;
-}
-
-button:active{
-    transform:scale(.98);
-}
-
 .device{
     background:#292929;
     padding:15px;
@@ -90,6 +74,22 @@ button:active{
     line-height:1.5;
 }
 
+button{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    border:0;
+    border-radius:12px;
+    font-size:16px;
+    color:white;
+    background:#333;
+    cursor:pointer;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
 .status{
     text-align:center;
     color:#aaa;
@@ -105,16 +105,26 @@ button:active{
     color:#ff7777;
 }
 
-.warning{
+.scanning{
     color:#ffc857;
-    line-height:1.6;
 }
 
-.big{
-    text-align:center;
-    font-size:30px;
-    font-weight:bold;
-    margin:15px 0;
+.info-row{
+    margin-bottom:12px;
+}
+
+.label{
+    color:#888;
+}
+
+.value{
+    color:white;
+    word-break:break-word;
+}
+
+.note{
+    color:#999;
+    line-height:1.6;
 }
 </style>
 </head>
@@ -123,23 +133,21 @@ button:active{
 
 <div class="container">
 
-    <div class="logo">📡</div>
+    <div class="logo">🔵</div>
 
-    <h1>ScannerKu</h1>
+    <h1>BLE Scanner</h1>
 
     <div class="subtitle">
-        Bluetooth Low Energy & Wi-Fi
+        Bluetooth Low Energy Scanner
     </div>
 
 
-    <!-- =========================
-         BLUETOOTH LOW ENERGY
-    ========================== -->
+    <!-- SCANNER -->
 
     <div class="card">
 
         <div class="title">
-            🔵 Bluetooth Low Energy
+            🔍 Pemindai BLE
         </div>
 
         <div class="device">
@@ -154,121 +162,68 @@ button:active{
 
         </div>
 
-        <button id="scanBleButton">
+        <button id="scanButton">
             🔍 CARI PERANGKAT BLE
         </button>
 
-        <button id="disconnectBleButton">
-            🔌 PUTUSKAN BLE
+        <button id="disconnectButton">
+            🔌 PUTUSKAN
         </button>
 
-        <div class="status" id="bleAvailability">
-            Memeriksa dukungan Bluetooth...
+        <div class="status" id="availability">
+            Memeriksa Bluetooth...
         </div>
 
     </div>
 
 
-    <!-- =========================
-         INFORMASI BLE
-    ========================== -->
+    <!-- INFORMASI PERANGKAT -->
 
     <div class="card">
 
         <div class="title">
-            📊 Informasi BLE
+            📱 Informasi Perangkat
         </div>
 
-        <div class="device-info">
+        <div class="info-row">
+            <div class="label">Nama</div>
+            <div class="value" id="infoName">-</div>
+        </div>
 
-            <div>
-                Nama:
-                <strong id="infoName">-</strong>
+        <div class="info-row">
+            <div class="label">ID</div>
+            <div class="value" id="infoId">-</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Status</div>
+            <div class="value" id="infoStatus">
+                Tidak terhubung
             </div>
+        </div>
 
-            <br>
-
-            <div>
-                ID:
-                <strong id="infoId">-</strong>
+        <div class="info-row">
+            <div class="label">Baterai</div>
+            <div class="value" id="infoBattery">
+                -
             </div>
-
-            <br>
-
-            <div>
-                Status:
-                <strong id="infoConnection">
-                    Tidak terhubung
-                </strong>
-            </div>
-
         </div>
 
     </div>
 
 
-    <!-- =========================
-         WI-FI
-    ========================== -->
+    <!-- CATATAN -->
 
     <div class="card">
 
         <div class="title">
-            📶 Wi-Fi
+            ℹ️ Informasi
         </div>
 
-        <div class="big">
-            📡
-        </div>
-
-        <div class="warning">
-            Website biasa tidak mendapatkan akses langsung
-            untuk memindai nama jaringan Wi-Fi di sekitar,
-            kekuatan sinyal setiap router, atau jarak router.
-        </div>
-
-        <button id="wifiCheckButton">
-            🔎 CEK KEMAMPUAN WI-FI
-        </button>
-
-        <div class="device">
-
-            <div class="device-name" id="wifiResult">
-                Belum diperiksa
-            </div>
-
-            <div class="device-info" id="wifiInfo">
-                Tekan tombol untuk melihat informasi yang
-                dapat diberikan browser.
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         CATATAN
-    ========================== -->
-
-    <div class="card">
-
-        <div class="title">
-            ℹ️ Catatan
-        </div>
-
-        <div class="device-info">
-
-            BLE dapat digunakan untuk berkomunikasi
-            dengan perangkat yang mendukung Bluetooth
-            Low Energy dan memberikan izin kepada website.
-
+        <div class="note">
+            Scanner ini khusus untuk Bluetooth Low Energy (BLE).
             <br><br>
-
-            Untuk Wi-Fi, browser tidak menyediakan
-            pemindai jaringan sekitar seperti aplikasi
-            Wi-Fi Analyzer.
-
+            Tidak ada fitur Wi-Fi dan tidak ada fitur radio FM.
         </div>
 
     </div>
@@ -278,40 +233,48 @@ button:active{
 
 <script>
 
-/* =================================
-   BLUETOOTH LOW ENERGY
-================================= */
-
 let bleDevice = null;
 let bleServer = null;
 
+
+// ELEMENT
+
+const scanButton =
+document.getElementById("scanButton");
+
+const disconnectButton =
+document.getElementById("disconnectButton");
+
 const bleName =
-    document.getElementById("bleName");
+document.getElementById("bleName");
 
 const bleStatus =
-    document.getElementById("bleStatus");
+document.getElementById("bleStatus");
 
-const bleAvailability =
-    document.getElementById("bleAvailability");
+const availability =
+document.getElementById("availability");
 
 const infoName =
-    document.getElementById("infoName");
+document.getElementById("infoName");
 
 const infoId =
-    document.getElementById("infoId");
+document.getElementById("infoId");
 
-const infoConnection =
-    document.getElementById("infoConnection");
+const infoStatus =
+document.getElementById("infoStatus");
+
+const infoBattery =
+document.getElementById("infoBattery");
 
 
-/* CEK BLUETOOTH */
+// CEK BLUETOOTH
 
 async function checkBluetooth(){
 
     if(!navigator.bluetooth){
 
-        bleAvailability.innerText =
-            "❌ Browser ini tidak mendukung Web Bluetooth.";
+        availability.innerText =
+        "❌ Browser tidak mendukung Web Bluetooth.";
 
         return;
     }
@@ -319,86 +282,82 @@ async function checkBluetooth(){
     try{
 
         const available =
-            await navigator.bluetooth.getAvailability();
+        await navigator.bluetooth.getAvailability();
 
         if(available){
 
-            bleAvailability.innerText =
-                "✅ Bluetooth tersedia";
+            availability.innerText =
+            "✅ Bluetooth tersedia";
 
         }else{
 
-            bleAvailability.innerText =
-                "⚠️ Bluetooth tidak tersedia atau tidak diizinkan.";
+            availability.innerText =
+            "⚠️ Bluetooth tidak tersedia.";
 
         }
 
     }catch(error){
 
-        bleAvailability.innerText =
-            "⚠️ Tidak dapat memeriksa Bluetooth.";
+        availability.innerText =
+        "⚠️ Tidak dapat memeriksa Bluetooth.";
 
     }
 
 }
 
 
-/* CARI BLE */
+// SCAN BLE
 
 async function scanBLE(){
 
     if(!navigator.bluetooth){
 
         bleName.innerText =
-            "❌ Web Bluetooth tidak tersedia";
+        "❌ Web Bluetooth tidak tersedia";
 
         bleStatus.innerText =
-            "Gunakan browser yang mendukung Web Bluetooth.";
+        "Gunakan browser yang mendukung Web Bluetooth.";
 
         return;
     }
 
+
     try{
 
         bleName.innerText =
-            "🔍 Menunggu pilihan perangkat...";
+        "🔍 Mencari perangkat...";
 
-        bleStatus.innerText =
-            "Pilih perangkat BLE dari jendela Bluetooth.";
+        bleStatus.innerHTML =
+        '<span class="scanning">● MENUNGGU PERANGKAT BLE</span>';
 
-        /*
-         * acceptAllDevices:
-         * menampilkan perangkat BLE yang
-         * dapat dipilih oleh browser.
-         */
 
         bleDevice =
-            await navigator.bluetooth.requestDevice({
+        await navigator.bluetooth.requestDevice({
 
-                acceptAllDevices:true,
+            acceptAllDevices:true,
 
-                optionalServices:[
-                    "battery_service"
-                ]
+            optionalServices:[
+                "battery_service"
+            ]
 
-            });
+        });
 
 
         infoName.innerText =
-            bleDevice.name || "Tanpa nama";
+        bleDevice.name || "Tanpa nama";
 
         infoId.innerText =
-            bleDevice.id || "-";
+        bleDevice.id || "-";
+
 
         bleName.innerText =
-            "📱 " +
-            (bleDevice.name || "Perangkat tanpa nama");
+        "📱 " +
+        (bleDevice.name || "Perangkat tanpa nama");
+
 
         bleStatus.innerText =
-            "Menghubungkan...";
+        "Menghubungkan...";
 
-
-        /* HUBUNGKAN GATT */
 
         if(!bleDevice.gatt){
 
@@ -410,19 +369,14 @@ async function scanBLE(){
 
 
         bleServer =
-            await bleDevice.gatt.connect();
+        await bleDevice.gatt.connect();
 
 
         bleStatus.innerHTML =
-            '<span class="connected">' +
-            '● TERHUBUNG' +
-            '</span>';
+        '<span class="connected">● TERHUBUNG</span>';
 
-
-        infoConnection.innerHTML =
-            '<span class="connected">' +
-            'TERHUBUNG' +
-            '</span>';
+        infoStatus.innerHTML =
+        '<span class="connected">TERHUBUNG</span>';
 
 
         bleDevice.addEventListener(
@@ -431,81 +385,81 @@ async function scanBLE(){
         );
 
 
-        /* COBA BACA BATERAI */
-
         await readBattery();
+
 
     }catch(error){
 
         bleName.innerText =
-            "❌ Tidak terhubung";
+        "❌ Tidak terhubung";
 
         bleStatus.innerText =
-            error.message ||
-            "Pencarian dibatalkan.";
+        error.message ||
+        "Pencarian dibatalkan.";
 
-        infoConnection.innerText =
-            "Tidak terhubung";
+        infoStatus.innerText =
+        "Tidak terhubung";
 
     }
 
 }
 
 
-/* BACA BATTERY SERVICE */
+// BACA BATERAI
 
 async function readBattery(){
 
-    if(!bleServer){
-
-        return;
-    }
+    if(!bleServer) return;
 
     try{
 
         const service =
-            await bleServer.getPrimaryService(
-                "battery_service"
-            );
+        await bleServer.getPrimaryService(
+            "battery_service"
+        );
 
 
         const characteristic =
-            await service.getCharacteristic(
-                "battery_level"
-            );
+        await service.getCharacteristic(
+            "battery_level"
+        );
 
 
         const value =
-            await characteristic.readValue();
+        await characteristic.readValue();
 
 
         const battery =
-            value.getUint8(0);
+        value.getUint8(0);
+
+
+        infoBattery.innerText =
+        battery + "%";
 
 
         bleStatus.innerHTML =
-            '<span class="connected">' +
-            '● TERHUBUNG' +
-            '</span><br><br>' +
-            '🔋 Baterai: ' +
-            battery +
-            '%';
+        '<span class="connected">● TERHUBUNG</span>' +
+        '<br><br>🔋 Baterai: ' +
+        battery +
+        '%';
+
 
     }catch(error){
 
+        infoBattery.innerText =
+        "Tidak tersedia";
+
         bleStatus.innerHTML =
-            '<span class="connected">' +
-            '● TERHUBUNG' +
-            '</span><br><br>' +
-            'Perangkat tidak menyediakan ' +
-            'Battery Service.';
+        '<span class="connected">● TERHUBUNG</span>' +
+        '<br><br>' +
+        'Perangkat tidak menyediakan Battery Service.';
 
     }
 
 }
 
 
-/* PUTUSKAN */
+// PUTUSKAN
 
 function disconnectBLE(){
 
@@ -520,92 +474,43 @@ function disconnectBLE(){
     }else{
 
         bleName.innerText =
-            "Tidak ada koneksi BLE";
+        "Tidak ada koneksi BLE";
 
         bleStatus.innerText =
-            "Tidak ada perangkat yang sedang terhubung.";
+        "Tidak ada perangkat yang terhubung.";
 
     }
 
 }
 
 
-/* SAAT TERPUTUS */
+// KETIKA TERPUTUS
 
 function handleDisconnect(){
 
     bleStatus.innerHTML =
-        '<span class="disconnected">' +
-        '● TERPUTUS' +
-        '</span>';
+    '<span class="disconnected">● TERPUTUS</span>';
 
-    infoConnection.innerHTML =
-        '<span class="disconnected">' +
-        'TERPUTUS' +
-        '</span>';
+    infoStatus.innerHTML =
+    '<span class="disconnected">TERPUTUS</span>';
 
 }
 
 
-/* =================================
-   WI-FI
-================================= */
+// TOMBOL
 
-function checkWiFi(){
+scanButton.addEventListener(
+    "click",
+    scanBLE
+);
 
-    const result =
-        document.getElementById("wifiResult");
-
-    const info =
-        document.getElementById("wifiInfo");
-
-
-    /*
-     * Browser tidak memberikan daftar
-     * SSID Wi-Fi sekitar.
-     */
-
-    result.innerText =
-        "⚠️ Scanner Wi-Fi tidak tersedia";
-
-    info.innerText =
-        "GitHub Pages/browser tidak memiliki " +
-        "akses ke daftar jaringan Wi-Fi sekitar. " +
-        "Untuk scan SSID, channel, RSSI, dan jarak " +
-        "diperlukan akses sistem/perangkat khusus.";
-
-}
+disconnectButton.addEventListener(
+    "click",
+    disconnectBLE
+);
 
 
-/* =================================
-   EVENT
-================================= */
-
-document
-    .getElementById("scanBleButton")
-    .addEventListener(
-        "click",
-        scanBLE
-    );
-
-
-document
-    .getElementById("disconnectBleButton")
-    .addEventListener(
-        "click",
-        disconnectBLE
-    );
-
-
-document
-    .getElementById("wifiCheckButton")
-    .addEventListener(
-        "click",
-        checkWiFi
-    );
-
-
-/* MULAI */
+// MULAI
 
 checkBluetooth();
 
