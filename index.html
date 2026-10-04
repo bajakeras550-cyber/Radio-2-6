@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>RadioKu</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#111;
+    color:white;
+    text-align:center;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+.logo{
+    font-size:70px;
+    margin-top:30px;
+}
+
+h1{
+    font-size:32px;
+    margin:10px 0;
+}
+
+.card{
+    background:#1e1e1e;
+    border-radius:20px;
+    padding:25px;
+    margin-top:30px;
+}
+
+.station{
+    font-size:22px;
+    margin-bottom:20px;
+}
+
+audio{
+    width:100%;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:15px;
+    border:0;
+    border-radius:12px;
+    background:#333;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:active{
+    transform:scale(0.98);
+}
+
+#status{
+    margin-top:15px;
+    color:#aaa;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">📻</div>
+
+    <h1>RadioKu</h1>
+
+    <div class="card">
+
+        <div class="station">
+            RRI Jakarta Pro 1
+        </div>
+
+        <audio id="radio" controls preload="none">
+            <source
+                src="https://stream-node1.rri.co.id/streaming/25/9025/rrijakartapro1.mp3"
+                type="audio/mpeg">
+            Browser kamu tidak mendukung audio.
+        </audio>
+
+        <button onclick="playRadio()">
+            ▶️ Putar Radio
+        </button>
+
+        <button onclick="reloadRadio()">
+            🔄 Muat Ulang
+        </button>
+
+        <div id="status">
+            Siap diputar
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const radio = document.getElementById("radio");
+const statusText = document.getElementById("status");
+
+function playRadio(){
+    statusText.textContent = "Menghubungkan ke radio...";
+
+    radio.play()
+    .then(() => {
+        statusText.textContent = "🔊 Radio sedang diputar";
+    })
+    .catch(() => {
+        statusText.textContent =
+            "❌ Radio tidak dapat diputar dari browser ini.";
+    });
+}
+
+function reloadRadio(){
+    radio.pause();
+    radio.load();
+
+    statusText.textContent = "Memuat ulang radio...";
+
+    setTimeout(() => {
+        playRadio();
+    }, 500);
+}
+
+radio.addEventListener("playing", () => {
+    statusText.textContent = "🔊 Radio sedang diputar";
+});
+
+radio.addEventListener("waiting", () => {
+    statusText.textContent = "⏳ Menghubungkan...";
+});
+
+radio.addEventListener("error", () => {
+    statusText.textContent =
+        "❌ Stream radio tidak bisa diakses.";
+});
+</script>
+
+</body>
+</html>
